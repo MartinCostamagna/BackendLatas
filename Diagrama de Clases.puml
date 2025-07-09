@@ -1,0 +1,63 @@
+@startuml latas
+class Lata{
+    +id: Identity
+    +nombre: String
+    +marca: Marca 
+    +tamaño: Tamaño
+    +sabor: Sabor
+    +especialidad: Especialidad
+    +edicionLimitada: Boolean
+    +edicionEspecial: EdicionEspecial
+    +descripcion: Descripcion
+    +anio: Integer
+    +Pais: Pais
+    +caja: Caja
+    +foto1: Bytea
+    +foto2: Bytea
+    +foto3: Bytea
+}
+class Marca{
+    +id: Identity
+    +nombre: String
+}
+class Tamaño{
+    +id: Identity
+    +volumen: Integer
+}
+class Sabor{
+    +id: Identity
+    +nombre: String
+}
+class Especialidad{
+    +id: Identity
+    +nombre: String
+}
+class EdicionEspecial{
+    +id: Identity
+    +nombre: String
+}
+class Descripcion{
+    +id: Identity
+    +texto: String
+}
+class Pais{
+    +id: Identity
+    +nombre: String
+}
+class Caja{
+    +id: Identity
+    +tamañoDeLata: Tamaño
+    +cantidadActual: Integer
+}
+
+Lata --> Marca
+Lata --> Tamaño
+Lata --> Sabor
+Lata --> Especialidad
+Lata --> EdicionEspecial
+Lata --> Descripcion
+Lata --> Anio
+Lata --> Pais
+Lata --> Caja
+Caja --> Tamaño
+@enduml
