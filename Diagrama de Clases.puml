@@ -1,7 +1,6 @@
 @startuml latas
 class Lata{
     +id: Identity
-    +nombre: String
     +marca: Marca 
     +tamaño: Tamaño
     +sabor: Sabor
@@ -12,9 +11,9 @@ class Lata{
     +anio: Integer
     +Pais: Pais
     +caja: Caja
-    +foto1: Bytea
-    +foto2: Bytea
-    +foto3: Bytea
+    +foto1: String
+    +foto2: String
+    +foto3: String
 }
 class Marca{
     +id: Identity
@@ -56,7 +55,6 @@ Lata --> Sabor
 Lata --> Especialidad
 Lata --> EdicionEspecial
 Lata --> Descripcion
-Lata --> Anio
 Lata --> Pais
 Lata --> Caja
 Caja --> Tamaño
