@@ -1,17 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Tamaño } from './tamaño.entity';
 import { Lata } from './lata.entity';
 
 @Entity('cajas')
 export class Caja {
-    @PrimaryGeneratedColumn()
-    id!: number;
+    @PrimaryColumn()
+    numeroDeCaja!: number;
 
-    @ManyToOne(() => Tamaño, (tamaño) => tamaño.cajas, { onDelete: 'SET NULL' })
+    @ManyToOne(() => Tamaño, (tamaño) => tamaño.cajas, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'tamañoId' })
     tamañoDeLata!: Tamaño | null;
 
-    @Column()
+    @Column({ default: 0 })
     cantidadActual!: number;
 
     @OneToMany(() => Lata, (lata) => lata.caja)

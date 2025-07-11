@@ -44,7 +44,7 @@ class Pais{
     +nombre: String
 }
 class Caja{
-    +id: Identity
+    +numeroDeCaja: Identity
     +tamañoDeLata: Tamaño
     +cantidadActual: Integer
 }
