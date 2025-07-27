@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { DescripcionService } from './descripcion.service';
-import { CreateDescripcionDto } from './dto/create-descripcion.dto';
-import { UpdateDescripcionDto } from './dto/update-descripcion.dto';
+import { CreateDescripcionDto } from '../dto/create-descripcion.dto';
+import { UpdateDescripcionDto } from '../dto/update-descripcion.dto';
 
-@Controller('descripcion')
+@Controller('descripciones')
 export class DescripcionController {
-  constructor(private readonly descripcionService: DescripcionService) {}
+  constructor(private readonly descripcionService: DescripcionService) { }
 
   @Post()
   create(@Body() createDescripcionDto: CreateDescripcionDto) {

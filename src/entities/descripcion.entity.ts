@@ -7,7 +7,7 @@ export class Descripcion {
     id!: number;
 
     @Column()
-    nombre!: string;
+    texto!: string;
 
     @OneToMany(() => Lata, (lata) => lata.descripcion)
     latas!: Lata[];

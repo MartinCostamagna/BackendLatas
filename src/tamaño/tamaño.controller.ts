@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { TamañoService } from './tamaño.service';
-import { CreateTamañoDto } from './dto/create-tamaño.dto';
-import { UpdateTamañoDto } from './dto/update-tamaño.dto';
+import { CreateTamañoDto } from '../dto/create-tamaño.dto';
+import { UpdateTamañoDto } from '../dto/update-tamaño.dto';
 
-@Controller('tamaño')
+@Controller('tamaños')
 export class TamañoController {
-  constructor(private readonly tamañoService: TamañoService) {}
+  constructor(private readonly tamañoService: TamañoService) { }
 
   @Post()
   create(@Body() createTamañoDto: CreateTamañoDto) {

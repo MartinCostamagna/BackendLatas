@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { LataService } from './lata.service';
-import { CreateLataDto } from './dto/create-lata.dto';
-import { UpdateLataDto } from './dto/update-lata.dto';
+import { CreateLataDto } from '../dto/create-lata.dto';
+import { UpdateLataDto } from '../dto/update-lata.dto';
 
-@Controller('lata')
+@Controller('latas')
 export class LataController {
-  constructor(private readonly lataService: LataService) {}
+  constructor(private readonly lataService: LataService) { }
 
   @Post()
   create(@Body() createLataDto: CreateLataDto) {

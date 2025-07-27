@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCajaDto } from './dto/create-caja.dto';
-import { UpdateCajaDto } from './dto/update-caja.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Caja } from 'src/entities/caja.entity';
+import { CreateCajaDto } from '../dto/create-caja.dto';
+import { UpdateCajaDto } from '../dto/update-caja.dto';
 
 @Injectable()
 export class CajaService {
-  create(createCajaDto: CreateCajaDto) {
-    return 'This action adds a new caja';
+  constructor(
+    @InjectRepository(Caja)
+    private readonly cajaRepository: Repository<Caja>,
+  ) { }
+
+  async create(createCajaDto: CreateCajaDto): Promise<Caja> {
+    const nuevaCaja = this.cajaRepository.create(createCajaDto);
+    return this.cajaRepository.save(nuevaCaja);
   }
 
-  findAll() {
-    return `This action returns all caja`;
+  async findAll(): Promise<Caja[]> {
+    return this.cajaRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} caja`;
+  async findOne(numeroDeCaja: number): Promise<Caja> {
+    const caja = await this.cajaRepository.findOneBy({ numeroDeCaja });
+    if (!caja) {
+      throw new NotFoundException(`La caja con el número ${numeroDeCaja} no fue encontrada.`);
+    }
+    return caja;
   }
 
-  update(id: number, updateCajaDto: UpdateCajaDto) {
-    return `This action updates a #${id} caja`;
+  async update(numeroDeCaja: number, updateCajaDto: UpdateCajaDto): Promise<Caja> {
+    const caja = await this.findOne(numeroDeCaja);
+    const cajaActualizada = await this.cajaRepository.preload({
+      numeroDeCaja: caja.numeroDeCaja,
+      ...updateCajaDto,
+    });
+
+    if (!cajaActualizada) {
+      throw new NotFoundException(`la caja con el número ${numeroDeCaja} no fue encontrada.`);
+    }
+
+    return this.cajaRepository.save(cajaActualizada);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} caja`;
+  async remove(numeroDeCaja: number): Promise<void> {
+    const caja = await this.findOne(numeroDeCaja);
+    await this.cajaRepository.remove(caja);
   }
 }

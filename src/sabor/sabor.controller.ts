@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { SaborService } from './sabor.service';
-import { CreateSaborDto } from './dto/create-sabor.dto';
-import { UpdateSaborDto } from './dto/update-sabor.dto';
+import { CreateSaborDto } from '../dto/create-sabor.dto';
+import { UpdateSaborDto } from '../dto/update-sabor.dto';
 
-@Controller('sabor')
+@Controller('sabores')
 export class SaborController {
-  constructor(private readonly saborService: SaborService) {}
+  constructor(private readonly saborService: SaborService) { }
 
   @Post()
   create(@Body() createSaborDto: CreateSaborDto) {

@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTamañoDto } from './dto/create-tamaño.dto';
-import { UpdateTamañoDto } from './dto/update-tamaño.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Tamaño } from 'src/entities/tamaño.entity';
+import { CreateTamañoDto } from '../dto/create-tamaño.dto';
+import { UpdateTamañoDto } from '../dto/update-tamaño.dto';
 
 @Injectable()
 export class TamañoService {
-  create(createTamañoDto: CreateTamañoDto) {
-    return 'This action adds a new tamaño';
+  constructor(
+    @InjectRepository(Tamaño)
+    private readonly tamañoRepository: Repository<Tamaño>,
+  ) { }
+
+  async create(createTamañoDto: CreateTamañoDto): Promise<Tamaño> {
+    const nuevoTamaño = this.tamañoRepository.create(createTamañoDto);
+    return this.tamañoRepository.save(nuevoTamaño);
   }
 
-  findAll() {
-    return `This action returns all tamaño`;
+  async findAll(): Promise<Tamaño[]> {
+    return this.tamañoRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tamaño`;
+  async findOne(id: number): Promise<Tamaño> {
+    const tamaño = await this.tamañoRepository.findOneBy({ id });
+    if (!tamaño) {
+      throw new NotFoundException(`El tamaño con el ID ${id} no fue encontrado.`);
+    }
+    return tamaño;
   }
 
-  update(id: number, updateTamañoDto: UpdateTamañoDto) {
-    return `This action updates a #${id} tamaño`;
+  async update(id: number, updateTamañoDto: UpdateTamañoDto): Promise<Tamaño> {
+    const tamaño = await this.findOne(id);
+    const tamañoActualizado = await this.tamañoRepository.preload({
+      id: tamaño.id,
+      ...updateTamañoDto,
+    });
+
+    if (!tamañoActualizado) {
+      throw new NotFoundException(`El tamaño con el ID ${id} no fue encontrado.`);
+    }
+
+    return this.tamañoRepository.save(tamañoActualizado);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tamaño`;
+  async remove(id: number): Promise<void> {
+    const tamaño = await this.findOne(id);
+    await this.tamañoRepository.remove(tamaño);
   }
 }

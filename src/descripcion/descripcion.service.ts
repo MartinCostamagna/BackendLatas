@@ -1,26 +1,51 @@
-import { Injectable } from '@nestjs/common';
-import { CreateDescripcionDto } from './dto/create-descripcion.dto';
-import { UpdateDescripcionDto } from './dto/update-descripcion.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Descripcion } from 'src/entities/descripcion.entity';
+import { CreateDescripcionDto } from '../dto/create-descripcion.dto';
+import { UpdateDescripcionDto } from '../dto/update-descripcion.dto';
 
 @Injectable()
 export class DescripcionService {
-  create(createDescripcionDto: CreateDescripcionDto) {
-    return 'This action adds a new descripcion';
+  constructor(
+    @InjectRepository(Descripcion)
+    private readonly descripcionRepository: Repository<Descripcion>,
+  ) { }
+
+  async create(createDescripcionDto: CreateDescripcionDto): Promise<Descripcion> {
+    const nuevaDescripcion = this.descripcionRepository.create(createDescripcionDto);
+    return this.descripcionRepository.save(nuevaDescripcion);
   }
 
-  findAll() {
-    return `This action returns all descripcion`;
+
+  async findAll(): Promise<Descripcion[]> {
+    return this.descripcionRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} descripcion`;
+  async findOne(id: number): Promise<Descripcion> {
+    const descripcion = await this.descripcionRepository.findOneBy({ id });
+    if (!descripcion) {
+      throw new NotFoundException(`La descripción con el ID ${id} no fue encontrada.`);
+    }
+    return descripcion;
   }
 
-  update(id: number, updateDescripcionDto: UpdateDescripcionDto) {
-    return `This action updates a #${id} descripcion`;
+  async update(id: number, updateDescripcionDto: UpdateDescripcionDto): Promise<Descripcion> {
+    const descripcion = await this.findOne(id);
+    const descripcionActualizada = await this.descripcionRepository.preload({
+      id: descripcion.id,
+      ...updateDescripcionDto,
+    });
+
+    if (!descripcionActualizada) {
+      throw new NotFoundException(`La descripción con el ID ${id} no fue encontrada.`);
+    }
+
+    return this.descripcionRepository.save(descripcionActualizada);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} descripcion`;
+  async remove(id: number): Promise<void> {
+    const descripcion = await this.findOne(id);
+    await this.descripcionRepository.remove(descripcion);
   }
 }

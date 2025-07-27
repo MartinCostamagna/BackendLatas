@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSaborDto } from './dto/create-sabor.dto';
-import { UpdateSaborDto } from './dto/update-sabor.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Sabor } from 'src/entities/sabor.entity';
+import { CreateSaborDto } from '../dto/create-sabor.dto';
+import { UpdateSaborDto } from '../dto/update-sabor.dto';
 
 @Injectable()
 export class SaborService {
-  create(createSaborDto: CreateSaborDto) {
-    return 'This action adds a new sabor';
+  constructor(
+    @InjectRepository(Sabor)
+    private readonly saborRepository: Repository<Sabor>,
+  ) { }
+
+  async create(createSaborDto: CreateSaborDto): Promise<Sabor> {
+    const nuevoSabor = this.saborRepository.create(createSaborDto);
+    return this.saborRepository.save(nuevoSabor);
   }
 
-  findAll() {
-    return `This action returns all sabor`;
+  async findAll(): Promise<Sabor[]> {
+    return this.saborRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sabor`;
+  async findOne(id: number): Promise<Sabor> {
+    const sabor = await this.saborRepository.findOneBy({ id });
+    if (!sabor) {
+      throw new NotFoundException(`El sabor con el ID ${id} no fue encontrado.`);
+    }
+    return sabor;
   }
 
-  update(id: number, updateSaborDto: UpdateSaborDto) {
-    return `This action updates a #${id} sabor`;
+  async update(id: number, updateSaborDto: UpdateSaborDto): Promise<Sabor> {
+    const sabor = await this.findOne(id);
+    const saborActualizado = await this.saborRepository.preload({
+      id: sabor.id,
+      ...updateSaborDto,
+    });
+
+    if (!saborActualizado) {
+      throw new NotFoundException(`El sabor con el ID ${id} no fue encontrado.`);
+    }
+
+    return this.saborRepository.save(saborActualizado);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} sabor`;
+  async remove(id: number): Promise<void> {
+    const sabor = await this.findOne(id);
+    await this.saborRepository.remove(sabor);
   }
 }

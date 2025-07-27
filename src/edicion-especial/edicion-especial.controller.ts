@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { EdicionEspecialService } from './edicion-especial.service';
-import { CreateEdicionEspecialDto } from './dto/create-edicion-especial.dto';
-import { UpdateEdicionEspecialDto } from './dto/update-edicion-especial.dto';
+import { CreateEdicionEspecialDto } from '../dto/create-edicion-especial.dto';
+import { UpdateEdicionEspecialDto } from '../dto/update-edicion-especial.dto';
 
-@Controller('edicion-especial')
+@Controller('ediciones-especiales')
 export class EdicionEspecialController {
-  constructor(private readonly edicionEspecialService: EdicionEspecialService) {}
+  constructor(private readonly edicionEspecialService: EdicionEspecialService) { }
 
   @Post()
   create(@Body() createEdicionEspecialDto: CreateEdicionEspecialDto) {
