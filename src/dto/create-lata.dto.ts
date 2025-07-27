@@ -41,20 +41,20 @@ export class CreateLataDto {
 
     @IsOptional()
     @IsInt({ message: 'El ID de la caja debe ser un número entero' })
-    cajaId?: number;
+    numeroDeCaja?: number;
 
     @IsNotEmpty({ message: 'La foto 1 es obligatoria' })
-    @IsUrl({}, { message: 'La foto 1 debe ser una URL válida' })
+    //@IsUrl({}, { message: 'La foto 1 debe ser una URL válida' })
     @MaxLength(255, { message: 'La URL de la foto 1 no puede exceder los 255 caracteres' })
     foto1!: string;
 
     @IsOptional()
-    @IsUrl({}, { message: 'La foto 2 debe ser una URL válida' })
+    //@IsUrl({}, { message: 'La foto 2 debe ser una URL válida' })
     @MaxLength(255, { message: 'La URL de la foto 2 no puede exceder los 255 caracteres' })
     foto2?: string;
 
     @IsOptional()
-    @IsUrl({}, { message: 'La foto 3 debe ser una URL válida' })
+    //@IsUrl({}, { message: 'La foto 3 debe ser una URL válida' })
     @MaxLength(255, { message: 'La URL de la foto 3 no puede exceder los 255 caracteres' })
     foto3?: string;
 }

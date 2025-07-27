@@ -54,11 +54,11 @@ export class Lata {
     @Column()
     foto1!: string;
 
-    @Column()
-    foto2!: string | null;
+    @Column({ nullable: true })
+    foto2!: string;
 
-    @Column()
-    foto3!: string | null;
+    @Column({ nullable: true })
+    foto3!: string;
 }
 
 

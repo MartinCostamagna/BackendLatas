@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LataModule } from './lata/lata.module';
@@ -13,7 +14,7 @@ import { PaisModule } from './pais/pais.module';
 import { CajaModule } from './caja/caja.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot({ type: 'postgres', url: process.env.DATABASE_URL, autoLoadEntities: true, synchronize: true, }), LataModule, MarcaModule, TamañoModule, SaborModule, EspecialidadModule, EdicionEspecialModule, DescripcionModule, PaisModule, CajaModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true, }), TypeOrmModule.forRoot({ type: 'postgres', url: process.env.DATABASE_URL, autoLoadEntities: true, synchronize: true, }), LataModule, MarcaModule, TamañoModule, SaborModule, EspecialidadModule, EdicionEspecialModule, DescripcionModule, PaisModule, CajaModule],
   controllers: [AppController],
   providers: [AppService],
 })

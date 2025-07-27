@@ -10,7 +10,7 @@ export class Tamaño {
     @Column()
     volumen!: number;
 
-    @OneToMany(() => Caja, (caja) => caja.tamañoDeLata)
+    @OneToMany(() => Caja, (caja) => caja.tamañoId)
     cajas!: Caja[];
 
     @OneToMany(() => Lata, (lata) => lata.tamaño)

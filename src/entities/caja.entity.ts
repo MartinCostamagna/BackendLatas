@@ -9,7 +9,7 @@ export class Caja {
 
     @ManyToOne(() => Tamaño, (tamaño) => tamaño.cajas, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'tamañoId' })
-    tamañoDeLata!: Tamaño | null;
+    tamañoId!: Tamaño;
 
     @Column({ default: 0 })
     cantidadActual!: number;

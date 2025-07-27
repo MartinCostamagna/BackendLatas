@@ -3,7 +3,7 @@ import { TamañoService } from './tamaño.service';
 import { CreateTamañoDto } from '../dto/create-tamaño.dto';
 import { UpdateTamañoDto } from '../dto/update-tamaño.dto';
 
-@Controller('tamaños')
+@Controller('tamanos')
 export class TamañoController {
   constructor(private readonly tamañoService: TamañoService) { }
 

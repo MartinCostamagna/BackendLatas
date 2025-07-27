@@ -13,7 +13,28 @@ export class LataService {
   ) { }
 
   async create(createLataDto: CreateLataDto): Promise<Lata> {
-    const nuevaLata = this.lataRepository.create(createLataDto);
+    const {
+      marcaId,
+      tamañoId,
+      saborId,
+      especialidadId,
+      edicionEspecialId,
+      descripcionId,
+      paisId,
+      numeroDeCaja,
+      ...otrosDatos
+    } = createLataDto;
+    const nuevaLata = this.lataRepository.create({
+      ...otrosDatos,
+    });
+    if (marcaId) nuevaLata.marca = { id: marcaId } as any;
+    if (tamañoId) nuevaLata.tamaño = { id: tamañoId } as any;
+    if (saborId) nuevaLata.sabor = { id: saborId } as any;
+    if (especialidadId) nuevaLata.especialidad = { id: especialidadId } as any;
+    if (edicionEspecialId) nuevaLata.edicionEspecial = { id: edicionEspecialId } as any;
+    if (descripcionId) nuevaLata.descripcion = { id: descripcionId } as any;
+    if (paisId) nuevaLata.pais = { id: paisId } as any;
+    if (numeroDeCaja) nuevaLata.caja = { numeroDeCaja: numeroDeCaja } as any;
     return this.lataRepository.save(nuevaLata);
   }
 
