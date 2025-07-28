@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { EdicionEspecialService } from './edicion-especial.service';
 import { CreateEdicionEspecialDto } from '../dto/create-edicion-especial.dto';
 import { UpdateEdicionEspecialDto } from '../dto/update-edicion-especial.dto';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('ediciones-especiales')
 export class EdicionEspecialController {
@@ -12,11 +13,13 @@ export class EdicionEspecialController {
     return this.edicionEspecialService.create(createEdicionEspecialDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.edicionEspecialService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.edicionEspecialService.findOne(+id);

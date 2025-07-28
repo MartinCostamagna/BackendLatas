@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PaisService } from './pais.service';
 import { CreatePaisDto } from '../dto/create-pais.dto';
 import { UpdatePaisDto } from '../dto/update-pais.dto';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('paises')
 export class PaisController {
@@ -12,11 +13,13 @@ export class PaisController {
     return this.paisService.create(createPaiDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.paisService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.paisService.findOne(+id);

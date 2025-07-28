@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { MarcaService } from './marca.service';
 import { CreateMarcaDto } from '../dto/create-marca.dto';
 import { UpdateMarcaDto } from '../dto/update-marca.dto';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('marcas')
 export class MarcaController {
@@ -12,11 +13,13 @@ export class MarcaController {
     return this.marcaService.create(createMarcaDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.marcaService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.marcaService.findOne(+id);

@@ -12,9 +12,11 @@ import { EdicionEspecialModule } from './edicion-especial/edicion-especial.modul
 import { DescripcionModule } from './descripcion/descripcion.module';
 import { PaisModule } from './pais/pais.module';
 import { CajaModule } from './caja/caja.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true, }), TypeOrmModule.forRoot({ type: 'postgres', url: process.env.DATABASE_URL, autoLoadEntities: true, synchronize: true, }), LataModule, MarcaModule, TamañoModule, SaborModule, EspecialidadModule, EdicionEspecialModule, DescripcionModule, PaisModule, CajaModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true, }), TypeOrmModule.forRoot({ type: 'postgres', url: process.env.DATABASE_URL, autoLoadEntities: true, synchronize: true, }), LataModule, MarcaModule, TamañoModule, SaborModule, EspecialidadModule, EdicionEspecialModule, DescripcionModule, PaisModule, CajaModule, UsersModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

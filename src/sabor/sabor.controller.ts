@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { SaborService } from './sabor.service';
 import { CreateSaborDto } from '../dto/create-sabor.dto';
 import { UpdateSaborDto } from '../dto/update-sabor.dto';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('sabores')
 export class SaborController {
@@ -12,11 +13,13 @@ export class SaborController {
     return this.saborService.create(createSaborDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.saborService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.saborService.findOne(+id);

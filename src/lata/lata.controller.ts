@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { LataService } from './lata.service';
 import { CreateLataDto } from '../dto/create-lata.dto';
 import { UpdateLataDto } from '../dto/update-lata.dto';
+import { Public } from '../auth/public.decorator';
 
 @Controller('latas')
 export class LataController {
@@ -12,11 +13,13 @@ export class LataController {
     return this.lataService.create(createLataDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.lataService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.lataService.findOne(+id);

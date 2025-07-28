@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { TamañoService } from './tamaño.service';
 import { CreateTamañoDto } from '../dto/create-tamaño.dto';
 import { UpdateTamañoDto } from '../dto/update-tamaño.dto';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('tamanos')
 export class TamañoController {
@@ -12,11 +13,13 @@ export class TamañoController {
     return this.tamañoService.create(createTamañoDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.tamañoService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tamañoService.findOne(+id);
