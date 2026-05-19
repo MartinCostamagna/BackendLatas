@@ -15,11 +15,11 @@ def fetch_api_lookup_map(endpoint_url, key_field, value_field='id'):
         return {str(item[key_field]).lower(): item[value_field] for item in data}
     except requests.exceptions.RequestException as e:
         print(
-            f"❌ Error fatal: No se pudo obtener el mapa desde {endpoint_url}. Mensaje: {e}")
+            f"Error fatal: No se pudo obtener el mapa desde {endpoint_url}. Mensaje: {e}")
         exit()
 
 
-print("✅ Obteniendo mapas de referencia desde la API...")
+print("Obteniendo mapas de referencia desde la API...")
 marcas_map = fetch_api_lookup_map(f"{API_BASE_URL}/marcas", "nombre")
 tamanos_map = fetch_api_lookup_map(f"{API_BASE_URL}/tamanos", "volumen")
 sabores_map = fetch_api_lookup_map(f"{API_BASE_URL}/sabores", "nombre")
@@ -30,7 +30,7 @@ ediciones_especiales_map = fetch_api_lookup_map(
 descripciones_map = fetch_api_lookup_map(
     f"{API_BASE_URL}/descripciones", "texto")
 paises_map = fetch_api_lookup_map(f"{API_BASE_URL}/paises", "nombre")
-print("✅ Mapas cargados correctamente desde la API.")
+print("Mapas cargados correctamente desde la API.")
 
 
 print("\nObteniendo datos de la tabla 'Latas' de Access...")
@@ -45,7 +45,7 @@ try:
 finally:
     if connection:
         connection.close()
-        print("✅ Conexión a Access cerrada.")
+        print("Conexión a Access cerrada.")
 
 
 print("\nIniciando proceso de carga a la API...")
@@ -69,6 +69,7 @@ for i, lata in enumerate(latas_de_access):
     except (ValueError, TypeError):
         numero_caja = None
 
+    folder_marca = str(lata.Marca).strip()
     payload = {
         "marcaId": marca_id,
         "tamañoId": tamano_id,
@@ -80,19 +81,19 @@ for i, lata in enumerate(latas_de_access):
         "anio": int(lata.Año),
         "paisId": pais_id,
         "numeroDeCaja": numero_caja,
-        "foto1": lata.Foto1,
-        "foto2": lata.Foto2,
-        "foto3": lata.Foto3,
+        "foto1": lata.Foto1 if lata.Foto1 else None,
+        "foto2": lata.Foto2 if lata.Foto2 else None,
+        "foto3": lata.Foto3 if lata.Foto3 else None,
     }
 
     try:
         res = requests.post(url_latas_api, json=payload)
         if res.status_code in (200, 201):
-            print(f"✅ Lata guardada correctamente.")
+            print(f"Lata guardada correctamente.")
         else:
-            print(f"❌ Error al guardar: {res.status_code} - {res.text}")
+            print(f"Error al guardar: {res.status_code} - {res.text}")
     except requests.exceptions.RequestException as e:
-        print(f"❌ Error de conexión a la API: {e}")
+        print(f"Error de conexión a la API: {e}")
         break
 
 print("\n--- Proceso finalizado. ---")
