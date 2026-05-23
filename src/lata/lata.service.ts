@@ -1,16 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Lata } from 'src/entities/lata.entity';
 import { CreateLataDto } from '../dto/create-lata.dto';
 import { UpdateLataDto } from '../dto/update-lata.dto';
+import * as fs from 'fs';
+import * as path from 'path';
+import { Caja } from 'src/entities/caja.entity';
 
 @Injectable()
 export class LataService {
   constructor(
     @InjectRepository(Lata)
     private readonly lataRepository: Repository<Lata>,
+
+    @InjectRepository(Caja)
+    private readonly cajaRepository: Repository<Caja>,
   ) { }
+
 
   async create(createLataDto: CreateLataDto): Promise<Lata> {
     const {
@@ -36,6 +43,71 @@ export class LataService {
     if (paisId) nuevaLata.pais = { id: paisId } as any;
     if (numeroDeCaja) nuevaLata.caja = { numeroDeCaja: numeroDeCaja } as any;
     return this.lataRepository.save(nuevaLata);
+  }
+
+  async guardarArchivosFisicos(nombreMarca: string, files: any[]): Promise<string[]> {
+    const rutasImagenes: string[] = [];
+
+    const carpetaLimpia = nombreMarca.trim();
+    const carpetaDestino = path.resolve('.', 'uploads', 'imagenes', carpetaLimpia);
+
+    if (!fs.existsSync(carpetaDestino)) {
+      fs.mkdirSync(carpetaDestino, { recursive: true });
+    }
+
+    files.forEach((file, index) => {
+      const timestamp = Date.now();
+      const extension = path.extname(file.originalname);
+
+
+      const nombreArchivoParaFoto = carpetaLimpia.replace(/\s+/g, '_');
+      const nombreArchivo = `${nombreArchivoParaFoto}_${timestamp}_${index + 1}${extension}`;
+
+      const rutaCompleta = path.join(carpetaDestino, nombreArchivo);
+
+      fs.writeFileSync(rutaCompleta, file.buffer);
+
+      rutasImagenes.push(`uploads/imagenes/${carpetaLimpia}/${nombreArchivo}`);
+    });
+
+    return rutasImagenes;
+  }
+
+  async insertarLataEnBd(dto: CreateLataDto) {
+    try {
+      const entidadFormateada = {
+        anio: dto.anio,
+        edicionLimitada: dto.edicionLimitada,
+        foto1: dto.foto1,
+        foto2: dto.foto2 || null,
+        foto3: dto.foto3 || null,
+        marca: { id: dto.marcaId },
+        tamaño: { id: dto.tamañoId },
+        sabor: { id: dto.saborId },
+        especialidad: { id: dto.especialidadId },
+        pais: { id: dto.paisId },
+        edicionEspecial: dto.edicionEspecialId ? { id: dto.edicionEspecialId } : null,
+        descripcion: dto.descripcionId ? { id: dto.descripcionId } : null,
+        caja: dto.numeroDeCaja ? { numeroDeCaja: dto.numeroDeCaja } : null,
+      };
+
+      console.log('Objeto formateado con relaciones para TypeORM:', entidadFormateada);
+
+      await this.lataRepository.insert(entidadFormateada as any);
+
+      if (dto.numeroDeCaja) {
+        console.log(`Incrementando cantidadActual de la caja número: ${dto.numeroDeCaja}`);
+
+        await this.cajaRepository.increment(
+          { numeroDeCaja: dto.numeroDeCaja }, 'cantidadActual', 1
+        );
+      }
+
+      return { message: 'Lata creada con éxito e incremento de caja registrado', data: dto };
+
+    } catch (error: any) {
+      throw new BadRequestException(`Error al insertar en la BD: ${error.message}`);
+    }
   }
 
   async findAll(): Promise<Lata[]> {
