@@ -4,7 +4,7 @@ db_file = r'D:\Programas\Ejecutables\Latas\Base de datos Latas.accdb'
 driver = '{Microsoft Access Driver (*.mdb, *.accdb)}'
 connection_string = f'DRIVER={driver};DBQ={db_file};'
 API_BASE_URL = "http://localhost:3000"
-url_latas_api = f"{API_BASE_URL}/latas"
+url_latas_api = f"{API_BASE_URL}/latas/sembrador"
 
 
 def fetch_api_lookup_map(endpoint_url, key_field, value_field='id'):

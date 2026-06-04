@@ -36,17 +36,22 @@ export class CajaService {
 
   async update(numeroDeCaja: number, updateCajaDto: UpdateCajaDto): Promise<Caja> {
     const { tamañoId, ...otrosDatos } = updateCajaDto;
-    const datosParaPreload = {
+
+    const datosParaPreload: any = {
       numeroDeCaja: numeroDeCaja,
       ...otrosDatos,
     };
-    if (tamañoId) {
-      datosParaPreload['tamañoId'] = { id: tamañoId } as Tamaño;
+
+    if (tamañoId !== undefined) {
+      datosParaPreload.tamañoId = tamañoId === null ? null : { id: tamañoId } as Tamaño;
     }
+
     const cajaActualizada = await this.cajaRepository.preload(datosParaPreload);
+
     if (!cajaActualizada) {
       throw new NotFoundException(`La caja con el número ${numeroDeCaja} no fue encontrada.`);
     }
+
     return this.cajaRepository.save(cajaActualizada);
   }
 
