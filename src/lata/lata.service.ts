@@ -67,7 +67,7 @@ export class LataService {
 
       fs.writeFileSync(rutaCompleta, file.buffer);
 
-      rutasImagenes.push(`uploads/imagenes/${carpetaLimpia}/${nombreArchivo}`);
+      rutasImagenes.push(`${carpetaLimpia}/${nombreArchivo}`);
     });
 
     return rutasImagenes;
