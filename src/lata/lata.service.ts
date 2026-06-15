@@ -122,12 +122,44 @@ export class LataService {
     return lata;
   }
 
-  async update(id: number, updateLataDto: UpdateLataDto): Promise<Lata> {
+  async update(id: number, updateLataDto: any): Promise<Lata> {
     const lata = await this.findOne(id);
-    const lataActualizada = await this.lataRepository.preload({
+
+    const datosActualizados: any = {
       id: lata.id,
-      ...updateLataDto,
-    });
+      anio: updateLataDto.anio,
+      edicionLimitada: updateLataDto.edicionLimitada
+    };
+
+    if (updateLataDto.marcaId) datosActualizados.marca = { id: updateLataDto.marcaId };
+    if (updateLataDto.tamañoId) datosActualizados.tamaño = { id: updateLataDto.tamañoId };
+    if (updateLataDto.saborId) datosActualizados.sabor = { id: updateLataDto.saborId };
+    if (updateLataDto.especialidadId) datosActualizados.especialidad = { id: updateLataDto.especialidadId };
+    if (updateLataDto.paisId) datosActualizados.pais = { id: updateLataDto.paisId };
+
+    if ('edicionEspecialId' in updateLataDto) {
+      datosActualizados.edicionEspecial = updateLataDto.edicionEspecialId ? { id: updateLataDto.edicionEspecialId } : null;
+    }
+    if ('descripcionId' in updateLataDto) {
+      datosActualizados.descripcion = updateLataDto.descripcionId ? { id: updateLataDto.descripcionId } : null;
+    }
+
+    if ('numeroDeCaja' in updateLataDto) {
+      const cajaAnterior = lata.caja?.numeroDeCaja;
+      const cajaNueva = updateLataDto.numeroDeCaja;
+
+      if (cajaAnterior !== cajaNueva) {
+        if (cajaAnterior) {
+          await this.cajaRepository.decrement({ numeroDeCaja: cajaAnterior }, 'cantidadActual', 1);
+        }
+        if (cajaNueva) {
+          await this.cajaRepository.increment({ numeroDeCaja: cajaNueva }, 'cantidadActual', 1);
+        }
+      }
+      datosActualizados.caja = cajaNueva ? { numeroDeCaja: cajaNueva } : null;
+    }
+
+    const lataActualizada = await this.lataRepository.preload(datosActualizados);
 
     if (!lataActualizada) {
       throw new NotFoundException(`La lata con el ID ${id} no fue encontrada.`);
