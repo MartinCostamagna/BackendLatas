@@ -122,6 +122,46 @@ export class LataService {
     return lata;
   }
 
+  async obtenerUltimasLatas(cantidad: number = 4): Promise<Lata[]> {
+    return this.lataRepository.find({
+      relations: ['marca', 'pais'],
+      order: {
+        id: 'DESC'
+      },
+      take: cantidad
+    });
+  }
+
+  async obtenerEstadisticas() {
+    const cantidadLatas = await this.lataRepository.count();
+    const resultadoPaises = await this.lataRepository.createQueryBuilder('lata')
+      .select('COUNT(DISTINCT lata.paisId)', 'cantidad')
+      .getRawOne();
+
+    return {
+      cantidadLatas,
+      cantidadPaises: Number(resultadoPaises.cantidad) || 0
+    };
+  }
+
+  async obtenerLataRandom(): Promise<Lata> {
+    const lataAleatoria = await this.lataRepository.createQueryBuilder('lata')
+      .orderBy('RANDOM()')
+      .limit(1)
+      .getOne();
+    if (!lataAleatoria) {
+      throw new NotFoundException('No hay latas en la base de datos.');
+    }
+    const lataCompleta = await this.lataRepository.findOne({
+      where: { id: lataAleatoria.id },
+      relations: ['marca', 'tamaño', 'sabor', 'especialidad', 'pais', 'edicionEspecial', 'descripcion', 'caja']
+    });
+    if (!lataCompleta) {
+      throw new NotFoundException('No hay se encontro la lata.');
+    }
+    return lataCompleta;
+  }
+
   async update(id: number, updateLataDto: any): Promise<Lata> {
     const lata = await this.findOne(id);
 

@@ -93,6 +93,24 @@ export class LataController {
   }
 
   @Public()
+  @Get('random')
+  obtenerRandom() {
+    return this.lataService.obtenerLataRandom();
+  }
+
+  @Public()
+  @Get('ultimas')
+  obtenerUltimas() {
+    return this.lataService.obtenerUltimasLatas(4);
+  }
+
+  @Public()
+  @Get('estadisticas')
+  obtenerEstadisticas() {
+    return this.lataService.obtenerEstadisticas();
+  }
+
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.lataService.findOne(+id);
