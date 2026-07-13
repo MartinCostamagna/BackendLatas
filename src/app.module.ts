@@ -16,6 +16,7 @@ import { CajaModule } from './caja/caja.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { join } from 'path';
+import { LataNoTengoModule } from './lata-no-tengo/lata-no-tengo.module';
 
 @Module({
   imports: [
@@ -32,11 +33,12 @@ import { join } from 'path';
         autoLoadEntities: true,
         synchronize: true,
       })
-    }), LataModule, MarcaModule, TamañoModule, SaborModule, EspecialidadModule, EdicionEspecialModule, DescripcionModule, PaisModule, CajaModule, UsersModule, AuthModule,
+    }), LataModule, MarcaModule, TamañoModule, SaborModule, EspecialidadModule, EdicionEspecialModule, DescripcionModule, LataNoTengoModule, PaisModule, CajaModule, UsersModule, AuthModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/static',
     }),
+    LataNoTengoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
