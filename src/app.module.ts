@@ -25,13 +25,12 @@ import { LataNoTengoModule } from './lata-no-tengo/lata-no-tengo.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: 'localhost',
-        port: configService.get<number>('POSTGRES_PORT') || 5432,
-        username: configService.get<string>('POSTGRES_USER'),
-        password: configService.get<string>('POSTGRES_PASSWORD'),
-        database: configService.get<string>('POSTGRES_DB'),
+        url: configService.get<string>('DATABASE_URL'),
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
+        ssl: {
+          rejectUnauthorized: false,
+        },
       })
     }), LataModule, MarcaModule, TamañoModule, SaborModule, EspecialidadModule, EdicionEspecialModule, DescripcionModule, LataNoTengoModule, PaisModule, CajaModule, UsersModule, AuthModule,
     ServeStaticModule.forRoot({
