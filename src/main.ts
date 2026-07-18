@@ -11,8 +11,11 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
   }));
   app.enableCors({
-    origin: 'http://localhost:4200',
-    credentials: true,
+    origin: [
+      'http://localhost:4200',
+      'https://latas.vercel.app'
+    ],
+    credentials: true
   });
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
