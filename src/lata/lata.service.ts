@@ -7,17 +7,36 @@ import { UpdateLataDto } from '../dto/update-lata.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Caja } from 'src/entities/caja.entity';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class LataService {
+  private supabase: SupabaseClient;
   constructor(
     @InjectRepository(Lata)
     private readonly lataRepository: Repository<Lata>,
 
     @InjectRepository(Caja)
     private readonly cajaRepository: Repository<Caja>,
-  ) { }
+  ) {
+    this.supabase = createClient(
+      process.env.SUPABASE_URL as string,
+      process.env.SUPABASE_KEY as string
+    );
+  }
 
+  private limpiarTexto(texto: string): string {
+    return texto
+      .replace(/[áÁ]/g, 'a')
+      .replace(/[éÉ]/g, 'e')
+      .replace(/[íÍ]/g, 'i')
+      .replace(/[óÓ]/g, 'o')
+      .replace(/[úÚ]/g, 'u')
+      .replace(/[ñÑ]/g, 'n')
+      .replace(/['%,]/g, '')
+      .trim()
+      .replace(/\s+/g, '_');
+  }
 
   async create(createLataDto: CreateLataDto): Promise<Lata> {
     const {
@@ -47,28 +66,35 @@ export class LataService {
 
   async guardarArchivosFisicos(nombreMarca: string, files: any[]): Promise<string[]> {
     const rutasImagenes: string[] = [];
+    const carpetaLimpia = this.limpiarTexto(nombreMarca);
 
-    const carpetaLimpia = nombreMarca.trim();
-    const carpetaDestino = path.resolve('.', 'uploads', 'imagenes', carpetaLimpia);
-
-    if (!fs.existsSync(carpetaDestino)) {
-      fs.mkdirSync(carpetaDestino, { recursive: true });
-    }
-
-    files.forEach((file, index) => {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       const timestamp = Date.now();
       const extension = path.extname(file.originalname);
+      const nombreArchivo = `${carpetaLimpia}_${timestamp}_${i + 1}${extension}`;
 
+      const rutaEnBucket = `imagenes/${carpetaLimpia}/${nombreArchivo}`;
 
-      const nombreArchivoParaFoto = carpetaLimpia.replace(/\s+/g, '_');
-      const nombreArchivo = `${nombreArchivoParaFoto}_${timestamp}_${index + 1}${extension}`;
+      const { error } = await this.supabase
+        .storage
+        .from('Imagenes')
+        .upload(rutaEnBucket, file.buffer, {
+          contentType: file.mimetype,
+          upsert: true
+        });
 
-      const rutaCompleta = path.join(carpetaDestino, nombreArchivo);
+      if (error) {
+        throw new BadRequestException(`Error subiendo imagen a la nube: ${error.message}`);
+      }
 
-      fs.writeFileSync(rutaCompleta, file.buffer);
+      const { data: publicUrlData } = this.supabase
+        .storage
+        .from('Imagenes')
+        .getPublicUrl(rutaEnBucket);
 
-      rutasImagenes.push(`${carpetaLimpia}/${nombreArchivo}`);
-    });
+      rutasImagenes.push(publicUrlData.publicUrl);
+    }
 
     return rutasImagenes;
   }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as fs from 'fs/promises';
@@ -6,29 +6,64 @@ import * as path from 'path';
 import { CreateLataNoTengoDto } from '../dto/create-lata-no-tengo.dto';
 import { UpdateLataNoTengoDto } from '../dto/update-lata-no-tengo.dto';
 import { LataNoTengo } from '../entities/lata-no-tengo.entity';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class LataNoTengoService {
+  private supabase: SupabaseClient;
   constructor(
     @InjectRepository(LataNoTengo)
     private readonly lataNoTengoRepository: Repository<LataNoTengo>,
-  ) { }
+  ) {
+    this.supabase = createClient(
+      process.env.SUPABASE_URL as string,
+      process.env.SUPABASE_KEY as string
+    );
+  }
+
+  private limpiarTexto(texto: string): string {
+    return texto
+      .replace(/[áÁ]/g, 'a')
+      .replace(/[éÉ]/g, 'e')
+      .replace(/[íÍ]/g, 'i')
+      .replace(/[óÓ]/g, 'o')
+      .replace(/[úÚ]/g, 'u')
+      .replace(/[ñÑ]/g, 'n')
+      .replace(/['%,]/g, '')
+      .trim()
+      .replace(/\s+/g, '_');
+  }
 
   async guardarArchivosFisicos(files: any[]): Promise<string[]> {
-    const carpetaDestino = path.join(process.cwd(), 'uploads', 'lata-no-tengo');
-
-    await fs.mkdir(carpetaDestino, { recursive: true });
-
     const rutasGuardadas: string[] = [];
 
     for (const file of files) {
       if (file) {
-        const nombreArchivo = `${Date.now()}-${file.originalname.replace(/\s+/g, '_')}`;
-        const rutaCompleta = path.join(carpetaDestino, nombreArchivo);
+        const timestamp = Date.now();
+        const originalLimpio = this.limpiarTexto(path.parse(file.originalname).name);
+        const extension = path.extname(file.originalname);
+        const nombreArchivo = `${timestamp}_${originalLimpio}${extension}`;
 
-        await fs.writeFile(rutaCompleta, file.buffer);
+        const rutaEnBucket = `lata-no-tengo/${nombreArchivo}`;
 
-        rutasGuardadas.push(nombreArchivo);
+        const { error } = await this.supabase
+          .storage
+          .from('Imagenes')
+          .upload(rutaEnBucket, file.buffer, {
+            contentType: file.mimetype,
+            upsert: true
+          });
+
+        if (error) {
+          throw new BadRequestException(`Error subiendo imagen a la nube: ${error.message}`);
+        }
+
+        const { data: publicUrlData } = this.supabase
+          .storage
+          .from('Imagenes')
+          .getPublicUrl(rutaEnBucket);
+
+        rutasGuardadas.push(publicUrlData.publicUrl);
       }
     }
 
@@ -72,12 +107,19 @@ export class LataNoTengoService {
 
     if (lata.foto1) {
       try {
-        const rutaFoto = path.join(process.cwd(), 'uploads', 'lata-no-tengo', lata.foto1);
-        await fs.unlink(rutaFoto);
+        const urlParts = lata.foto1.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+
+        await this.supabase
+          .storage
+          .from('Imagenes')
+          .remove([`lata-no-tengo/${fileName}`]);
+
       } catch (error) {
-        console.warn(`No se pudo eliminar el archivo físico: ${lata.foto1}`, error);
+        console.warn(`No se pudo eliminar el archivo en Supabase: ${lata.foto1}`, error);
       }
     }
+
     await this.lataNoTengoRepository.remove(lata);
   }
 }
