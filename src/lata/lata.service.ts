@@ -72,7 +72,9 @@ export class LataService {
       const file = files[i];
       const timestamp = Date.now();
       const extension = path.extname(file.originalname);
-      const nombreArchivo = `${carpetaLimpia}_${timestamp}_${i + 1}${extension}`;
+
+      let nombreArchivo = `${carpetaLimpia}_${timestamp}_${i + 1}${extension}`;
+      nombreArchivo = nombreArchivo.replace(/[^a-zA-Z0-9.\-_]/g, '');
 
       const rutaEnBucket = `imagenes/${carpetaLimpia}/${nombreArchivo}`;
 

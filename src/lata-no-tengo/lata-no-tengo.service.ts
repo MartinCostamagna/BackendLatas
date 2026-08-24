@@ -42,7 +42,9 @@ export class LataNoTengoService {
         const timestamp = Date.now();
         const originalLimpio = this.limpiarTexto(path.parse(file.originalname).name);
         const extension = path.extname(file.originalname);
-        const nombreArchivo = `${timestamp}_${originalLimpio}${extension}`;
+
+        let nombreArchivo = `${timestamp}_${originalLimpio}${extension}`;
+        nombreArchivo = nombreArchivo.replace(/[^a-zA-Z0-9.\-_]/g, '');
 
         const rutaEnBucket = `lata-no-tengo/${nombreArchivo}`;
 
